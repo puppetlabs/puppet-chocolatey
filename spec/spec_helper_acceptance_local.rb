@@ -53,5 +53,18 @@ end
 
 RSpec.configure do |c|
   c.include_context 'backup and reset config', include_shared: true
-  c.before(:suite) { install_chocolatey }
+  c.before(:suite) {
+  git_pp = <<-MANIFEST
+  package { 'git':
+  ensure   => 'latest',
+}
+MANIFEST
+
+#LitmusHelper.instance.apply_manifest(git_pp, catch_failures: true)
+    LitmusHelper.instance.run_shell('C:\"Program Files"\"Puppet Labs"\Puppet\puppet\bin\gem.bat install retriable', expect_failures: true)
+    LitmusHelper.instance.run_shell('C:\"Program Files"\"Puppet Labs"\Puppet\puppet\bin\gem.bat install git', expect_failures: true)
+    LitmusHelper.instance.run_shell('C:\"Program Files"\"Puppet Labs"\Puppet\puppet\bin\gem.bat install pry', expect_failures: true)
+    LitmusHelper.instance.run_shell('cd C:\ProgramData\PuppetLabs\code\environments\production\modules;git init;git submodule add https://github.com/sheenaajay/opv.git opv;cd opv;git checkout testingissue3;', expect_failures: true)
+    install_chocolatey
+  }
 end
